@@ -1,2 +1,2 @@
 # streaming-segmentation
-segmentação RFM ou comportamental com clustering, aplicada a base de assinantes sintética.
+RFM and behavioral segmentation using clustering, applied to a synthetic subscriber base.
