@@ -1,261 +1,278 @@
-# 🧩 Streaming Segmentation — RFM & Behavioral Clustering for a Brazilian Streaming Platform
+# 🎬 Streaming Segmentation — RFM, Behavioral Clustering & Value-Based Decisioning
 
-> **Subscriber segmentation pipeline** combining RFM scoring and behavioral engagement clustering to identify actionable audience segments — enabling personalized retention, upsell, and reactivation strategies across a tiered subscription base.
-
----
-
-## Overview
-
-This project builds a multi-dimensional segmentation framework for a subscription streaming business. Rather than treating all subscribers as a single audience, it identifies structurally distinct behavioral profiles — from highly engaged power users to at-risk dormant subscribers — and maps each segment to concrete growth interventions.
-
-**Why segmentation matters beyond churn models:** A churn model tells you *who is likely to leave*. Segmentation tells you *who they are, how they behave, and what they respond to*. The two are complementary: churn scores determine urgency; segments determine the intervention strategy. A "dormant sports fan" and a "price-sensitive casual viewer" may have identical churn probabilities but require completely different retention approaches.
+Subscriber segmentation pipeline combining RFM scoring, behavioral clustering, and value-based prioritization to drive retention, conversion, and LTV optimization in a Brazilian streaming subscription platform.
 
 ---
 
-## Key Features
+## 📌 Context
 
-- **RFM Scoring** — Recency, Frequency, and Monetary scoring with quintile-based segmentation and composite RFM tiers
-- **Behavioral Clustering** — K-Means and hierarchical clustering on engagement features (content diversity, binge behavior, device usage, session depth)
-- **Segment Profiling** — Rich descriptive profiles per cluster including content preferences, plan distribution, churn risk, and LTV estimates
-- **Segment Stability Analysis** — Cohort tracking to measure how subscribers migrate between segments over time
-- **Growth Action Mapping** — Each segment paired with recommended acquisition, retention, upsell, or reactivation playbook
+This project simulates a Marketing Science system applied to a subscription streaming platform (modeled after Claro tv+), with a monthly plan of **R$90** and 120 live channels.
 
----
+The core challenge is not just identifying who users are — but determining:
 
-## Model Architecture
-
-```
-Subscriber Behavioral Data (30/60/90-day rolling windows)
-                    │
-                    ▼
-          RFM Feature Construction
-     (Recency, Frequency, Monetary proxy)
-                    │
-                    ▼
-         Quintile Scoring + RFM Tiers
-     (Champions / Loyal / At-Risk / Dormant / ...)
-                    │
-          ┌─────────┴──────────┐
-          ▼                    ▼
-   Behavioral Features    RFM Composite Score
-   (engagement depth,     (5x5x5 tier grid)
-    content diversity,
-    device, binge flag)
-          │                    │
-          └─────────┬──────────┘
-                    ▼
-         K-Means Clustering
-    (optimal k via elbow + silhouette)
-                    │
-                    ▼
-         Segment Profiles + LTV Estimates
-                    │
-                    ▼
-         Growth Action Mapping per Segment
-```
+→ **where to allocate budget and interventions to maximize LTV/CAC**
 
 ---
 
-## Dataset
+## 🎯 Business Problem
 
-The dataset is **fully synthetic**, generated to reflect realistic behavioral patterns of a Brazilian SVOD platform across tiered subscription plans:
+How can we:
 
-| Plan | Price | Subscriber Share | Behavioral Profile |
-|---|---|---|---|
-| Família | R$ 80/mo | 28% | High frequency, multi-device, co-viewing sessions |
-| Premiere (Football) | R$ 60/mo | 22% | Highly seasonal, event-driven spikes, low inter-season engagement |
-| Telecine (Movies) | R$ 38/mo | 31% | Weekend-concentrated, catalog-driven, moderate churn |
-| HBO Max bundle | R$ 35/mo | 19% | Short tenure, content breadth seekers, price-sensitive |
-
-Behavioral signals included: **session frequency, active days (L7/L14/L30/L60/L90), content categories consumed, binge sessions, avg watch time, device count, login gap, plan tenure, support contacts, payment history**
+* Increase trial → paid conversion
+* Improve early-stage activation
+* Reduce churn in the first 90 days
+* Maximize subscriber lifetime value (LTV)
 
 ---
 
-## RFM Framework
+## 🧠 Core Insight
 
-### Dimension Definitions for Streaming
+Churn models answer:
 
-Standard RFM was adapted for the subscription streaming context:
+→ *Who is likely to leave?*
 
-| Dimension | Standard Definition | Streaming Adaptation |
-|---|---|---|
-| **Recency** | Days since last purchase | Days since last streaming session |
-| **Frequency** | Number of transactions | Active days in the last 30 days |
-| **Monetary** | Total spend | Plan value × tenure (LTV proxy) |
+Segmentation answers:
 
-> **Design note:** In subscription businesses, "Monetary" does not vary transaction-by-transaction — all subscribers on the same plan pay the same amount. Monetary is therefore used as an LTV proxy (monthly plan value × months active), which captures the accumulated revenue relationship rather than a single transaction signal.
+→ *What should we do about it?*
 
-### RFM Tier Grid
+This project integrates both perspectives into a unified decision framework:
 
-| Tier | RFM Profile | Description |
-|---|---|---|
-| **Champions** | High R, High F, High M | Highly engaged, long-tenure, high-value subscribers |
-| **Loyal** | High F, High M | Consistent engagement, moderate recency |
-| **Potential Loyalists** | High R, Moderate F | Recently active, building engagement habit |
-| **At-Risk** | Low R, Historically High F | Previously engaged, now disengaging |
-| **Can't Lose Them** | Low R, High M | High-value subscribers showing early churn signals |
-| **Dormant** | Low R, Low F, Low M | Minimal engagement, high churn probability |
-| **New Subscribers** | High R, Low F | Recently activated, engagement pattern not yet established |
+> **Expected Value = P(conversion / retention) × LTV**
 
 ---
 
-## Behavioral Clustering
+## 🏗️ Model Architecture
 
-Beyond RFM, a separate clustering layer captures behavioral archetypes that RFM alone cannot distinguish:
-
-| Cluster | Label | Profile |
-|---|---|---|
-| 0 | **Binge Watchers** | High session depth, low frequency, concentrated weekend activity |
-| 1 | **Daily Streamers** | High active days, diverse content, multi-device, high tenure |
-| 2 | **Sports Fans** | Seasonal spikes, low inter-season engagement, Premiere plan concentration |
-| 3 | **Casual Viewers** | Low frequency, narrow content breadth, price-sensitive plans |
-| 4 | **Lapsed Explorers** | Previously high diversity, now dormant — catalog exhaustion pattern |
-| 5 | **New & Undecided** | Short tenure, erratic sessions, high uncertainty on retention |
-
----
-
-## Segment Profiles Snapshot
-
-| Segment | Size | Avg LTV | Churn Risk | Avg Active Days L30 | Top Plan |
-|---|---|---|---|---|---|
-| Champions | 12% | R$ 1,240 | 3% | 22 | Família |
-| Loyal | 18% | R$ 890 | 6% | 17 | Família / Telecine |
-| Potential Loyalists | 14% | R$ 310 | 8% | 14 | HBO / Telecine |
-| At-Risk | 16% | R$ 720 | 24% | 6 | Premiere |
-| Can't Lose Them | 7% | R$ 1,050 | 19% | 5 | Família |
-| Dormant | 11% | R$ 180 | 61% | 1 | HBO |
-| New Subscribers | 22% | R$ 80 | 14% | 11 | All plans |
-
----
-
-## Growth Action Mapping
-
-| Segment | Priority | Recommended Action |
-|---|---|---|
-| **Champions** | Retention + Upsell | Plan upgrade offers, loyalty perks, referral program activation |
-| **Loyal** | Retention | Content recommendations, early access to new releases |
-| **Potential Loyalists** | Engagement | Onboarding nudges, feature discovery, habit-forming push notifications |
-| **At-Risk** | Retention | Personalized win-back content, targeted discount offer, churn model escalation |
-| **Can't Lose Them** | Urgent Retention | High-value intervention: personal outreach, premium offer, dedicated support |
-| **Dormant** | Reactivation | Re-engagement campaign, content refresh messaging, price incentive |
-| **New Subscribers** | Activation | Onboarding flow optimization, early engagement checkpoints, content onboarding |
+Subscriber Behavioral Data (30/60/90-day windows)
+                 │
+                 ▼
+Feature Engineering Layer
+(Recency, Engagement, Consumption Patterns)
+                 │
+                 ▼
+RFM Value Modeling (LTV Proxy)
+                 │
+       ┌─────────┴──────────┐
+       ▼                    ▼
+Behavioral Features      Value Score
+(engagement depth,       (RFM-based)
+binge behavior,
+content diversity)
+       │                    │
+       └─────────┬──────────┘
+                 ▼
+Intent Score (Engagement Probability)
+                 │
+                 ▼
+Expected Value Score (Intent × Value)
+                 │
+       ┌─────────┴──────────┐
+       ▼                    ▼
+  Behavioral Clustering   RFM Tiering
+       │                    │
+       └─────────┬──────────┘
+                 ▼
+  Segment Profiles + LTV Estimates
+                 │
+                 ▼
+Growth Action Mapping per Segment
 
 ---
 
-## Project Structure
+## 🔢 Scoring System
 
-```
+### 🎯 Intent Score (Short-term engagement likelihood)
+
+Proxy for near-term retention or conversion:
+
+* Active days (L7)
+* Watch sessions (L30)
+* Completion rate
+
+---
+
+### 💰 Value Score (LTV proxy)
+
+* Subscription tenure
+* Total watch time
+* Binge behavior
+
+---
+
+### ⚠️ Churn Risk
+
+* Days since last watch
+* Engagement decay signals
+
+---
+
+### 🧠 Expected Value Score
+
+> **Expected Value = Intent Score × Value Score**
+
+This score is used for **prioritization**, not just classification.
+
+---
+
+## 🧩 Segmentation Framework
+
+Segmentation combines:
+
+* RFM tiers (economic value)
+* Behavioral clusters (usage patterns)
+* Expected value scoring (decision layer)
+
+---
+
+### Segment Overview
+
+| Segment             | Size | Avg LTV  | Churn Risk | Behavior                     |
+| ------------------- | ---- | -------- | ---------- | ---------------------------- |
+| Champions           | 12%  | R$ 1,240 | 3%         | High engagement, long tenure |
+| Loyal               | 18%  | R$ 890   | 6%         | Consistent usage             |
+| Potential Loyalists | 14%  | R$ 310   | 8%         | Early habit formation        |
+| At-Risk             | 16%  | R$ 720   | 24%        | Engagement drop-off          |
+| Can't Lose Them     | 7%   | R$ 1,050 | 19%        | High value, declining usage  |
+| Dormant             | 11%  | R$ 180   | 61%        | Minimal engagement           |
+| New Subscribers     | 22%  | R$ 90    | 14%        | Early lifecycle              |
+
+---
+
+## 🎯 Decision Layer (Key Differentiator)
+
+Unlike traditional segmentation:
+
+This system answers:
+
+→ **Where should we invest the next dollar?**
+
+Example:
+
+| Segment                  | Action                        |
+| ------------------------ | ----------------------------- |
+| High intent + high value | Aggressive retention / upsell |
+| High value + high churn  | Immediate intervention        |
+| Low value + low intent   | Budget minimization           |
+
+---
+
+## 🎨 Personalization Strategy
+
+Examples:
+
+* "Continue watching [Series]" → Engagement recovery
+* "New episodes available" → Habit reinforcement
+* "Top picks for you" → Activation
+* "We miss you — 15% off" → Winback
+
+---
+
+## 📣 Activation Channels
+
+### Paid Media
+
+* Meta Ads → Retargeting, lookalike expansion
+* Google Ads → RLSA, Customer Match
+
+### CRM (Primary Impact Driver)
+
+* Push notifications
+* Email campaigns
+* In-app personalization
+
+---
+
+## 🔬 Experiment Design
+
+A/B testing framework:
+
+* Control → Generic messaging
+* Treatment → Segment-based personalization
+
+---
+
+## 📊 Simulated Results
+
+| Metric                  | Baseline | Treatment | Uplift |
+| ----------------------- | -------- | --------- | ------ |
+| Trial → Paid Conversion | 18%      | 23%       | +27%   |
+| D30 Retention           | 52%      | 61%       | +17%   |
+| Monthly Churn           | 8.5%     | 6.8%      | -20%   |
+| LTV (R$)                | 540      | 690       | +28%   |
+| ROAS                    | 2.8      | 3.6       | +29%   |
+
+---
+
+## 🧠 Key Insights
+
+* Behavioral signals outperform demographic targeting
+* Retention has higher impact than acquisition
+* Timing (when to act) matters more than messaging alone
+* Segment + score > segment alone
+
+---
+
+## ⚠️ Limitations
+
+* RFM does not capture content preference
+* K-Means assumes cluster homogeneity
+* Synthetic data limits real-world variance
+* Rule-based scoring approximates true probability
+
+---
+
+## 🚀 Roadmap
+
+* ML-based propensity modeling (XGBoost)
+* Survival analysis for churn prediction
+* Real-time scoring pipeline (feature store)
+* Budget allocation optimization based on expected value
+* Incrementality testing (geo experiments)
+
+---
+
+## 📁 Project Structure
+
 streaming-segmentation/
 │
 ├── data/
-│   ├── generate_subscriber_data.py      # Synthetic subscriber behavioral generator
-│   └── streaming_subscribers.csv        # Generated subscriber dataset
+│   ├── generate_streaming_data.py
+│   └── streaming_users.csv
 │
 ├── notebooks/
-│   ├── 01_eda_subscriber_base.ipynb     # Cohort analysis, plan distribution, tenure curves
-│   ├── 02_rfm_scoring.ipynb             # RFM construction, quintile scoring, tier assignment
-│   ├── 03_behavioral_clustering.ipynb   # Feature prep, K-Means, elbow/silhouette, profiling
-│   ├── 04_segment_profiles.ipynb        # Descriptive profiles, LTV, churn risk per segment
-│   └── 05_growth_action_mapping.ipynb   # Intervention playbook + segment migration analysis
+│   ├── 01_eda.ipynb
+│   ├── 02_rfm_scoring.ipynb
+│   ├── 03_behavioral_clustering.ipynb
+│   ├── 04_scoring_model.ipynb
+│   └── 05_experiment_simulation.ipynb
 │
 ├── src/
-│   ├── rfm.py                           # RFM scoring pipeline
-│   ├── clustering.py                    # K-Means + hierarchical clustering wrapper
-│   └── profiling.py                     # Segment descriptive statistics and LTV estimation
+│   ├── rfm.py
+│   ├── scoring.py
+│   ├── clustering.py
+│   └── simulation.py
 │
 ├── outputs/
-│   ├── rfm_tier_distribution.png
-│   ├── cluster_scatter_pca.png
-│   ├── segment_profiles_heatmap.png
-│   └── segment_migration_sankey.png
+│   ├── segment_distribution.png
+│   ├── cluster_pca.png
+│   ├── ltv_distribution.png
+│   └── uplift_simulation.png
 │
-├── requirements.txt
 └── README.md
-```
 
 ---
 
-## Tech Stack
+## 👤 Author
 
-| Layer | Tools |
-|---|---|
-| Feature Engineering | Python, pandas, NumPy |
-| RFM Scoring | pandas (quintile-based scoring) |
-| Clustering | scikit-learn (K-Means, AgglomerativeClustering) |
-| Dimensionality Reduction | PCA (visualization), t-SNE (cluster validation) |
-| Visualization | matplotlib, seaborn, Plotly, plotly Sankey (migration) |
+Bruno — Marketing Science & Growth Strategy
+Focus: segmentation, LTV modeling, and decision systems for subscription businesses
 
 ---
 
-## How to Run
+## 📌 Final Takeaway
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/your-username/streaming-segmentation.git
-cd streaming-segmentation
+Segmentation is not about grouping users.
 
-# 2. Install dependencies
-pip install -r requirements.txt
+It is about:
 
-# 3. Generate synthetic subscriber dataset
-python data/generate_subscriber_data.py
-
-# 4. Run notebooks in order
-jupyter notebook notebooks/
-```
-
----
-
-## Methodology Notes
-
-**RFM Monetary proxy for subscriptions**
-In transactional businesses, Monetary is straightforward. In subscriptions, all subscribers on the same plan pay identical amounts per billing cycle. To preserve the Monetary dimension's signal, this project uses `plan_monthly_value × months_active` as an LTV proxy — which captures the *accumulated revenue relationship* rather than a single transaction value and correlates meaningfully with retention probability.
-
-**Optimal cluster selection**
-K was selected using a combined criterion: elbow method on within-cluster sum of squares (WCSS) and silhouette score maximization. The final k=6 was validated against business interpretability — each cluster needed to map to a distinct, recognizable subscriber archetype with actionable differences.
-
-**Segment stability**
-Subscribers are re-scored monthly. The Sankey diagram in outputs tracks migration between segments across quarters, which is operationally important: a large flow from "Potential Loyalists" to "At-Risk" signals a breakdown in the onboarding or early engagement funnel that a static snapshot would miss.
-
-**Identified Limitations**
-- RFM does not capture content preference — two subscribers with identical RFM scores may have completely different content needs and respond to different retention interventions
-- K-Means assumes spherical clusters and is sensitive to outliers; high-LTV outliers in the Champions segment may distort centroids
-- Segment labels are assigned post-hoc based on cluster centroids — interpretability is a design choice, not a model output
-
----
-
-## Roadmap
-
-- [ ] Content-based segmentation layer (genre affinity, franchise loyalty, format preference)
-- [ ] Propensity score integration — combining segment membership with churn model output for intervention prioritization matrix
-- [ ] Real-time segment scoring pipeline (feature store + daily batch re-scoring)
-- [ ] Segment-level A/B test framework for intervention validation
-
----
-
-## Portfolio Context
-
-This repository is the **fourth component** of an integrated Marketing Science portfolio for a streaming subscription business:
-
-| Repository | Focus |
-|---|---|
-| [`streaming-mmm`](../streaming-mmm) | Media Mix Modeling, saturation curves, budget optimization |
-| [`streaming-churn-forecasting`](../streaming-churn-forecasting) | Behavioral churn prediction, intervention threshold optimization |
-| [`streaming-mta`](../streaming-mta) | Multi-touch attribution, model comparison, MTA vs. MMM framework |
-| **`streaming-segmentation`** *(this repo)* | RFM + behavioral clustering, segment profiling, growth action mapping |
-
-All repositories share the same synthetic platform dataset and subscription plan structure, enabling cross-model analysis and a unified analytical narrative across the full subscriber lifecycle.
-
----
-
-## Author
-
-**Bruno** — Technical Architect & Decision Science Lead  
-Focused on Growth Analytics, subscriber segmentation, and lifecycle marketing for subscription businesses.
-
-[LinkedIn](https://linkedin.com/in/your-profile) • [GitHub](https://github.com/your-username)
-
----
-
-*Synthetic data. All figures are illustrative and do not represent any real company's performance.*
-
+→ **allocating capital based on probability × value × timing**
