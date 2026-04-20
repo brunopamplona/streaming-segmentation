@@ -6,7 +6,7 @@ Subscriber segmentation pipeline combining RFM scoring, behavioral clustering, a
 
 ## 📌 Context
 
-This project simulates a Marketing Science system applied to a subscription streaming platform (modeled after Claro tv+), with a monthly plan of **R$90** and 120 live channels.
+This project simulates a Marketing Science system applied to a subscription streaming platform (modeled after a ficticious video+ streaming services in Brazil), with a monthly plan of **R$90** and 120+ live channels.
 
 The core challenge is not just identifying who users are — but determining:
 
