@@ -233,7 +233,7 @@ A/B testing framework:
 ---
 
 ## 📁 Project Structure
-
+```
 streaming-segmentation/
 │
 ├── data/
@@ -260,7 +260,7 @@ streaming-segmentation/
 │   └── uplift_simulation.png
 │
 └── README.md
-
+```
 ---
 
 ## 👤 Author
