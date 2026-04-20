@@ -43,56 +43,41 @@ This project integrates both perspectives into a unified decision framework:
 
 ## 🏗️ Model Architecture
 
+```
 Subscriber Behavioral Data (30/60/90-day windows)
-
                  │
-                 ▼
-                 
+                 ▼              
 Feature Engineering Layer
 (Recency, Engagement, Consumption Patterns)
-
                  │
-                 ▼
-                 
+                 ▼                 
 RFM Value Modeling (LTV Proxy)
-
                  │
        ┌─────────┴──────────┐
        ▼                    ▼
-       
 Behavioral Features      Value Score
 (engagement depth,       (RFM-based)
 binge behavior,
 content diversity)
-
        │                    │
        └─────────┬──────────┘
                  ▼
-
 Intent Score (Engagement Probability)
-
                  │
                  ▼
-
 Expected Value Score (Intent × Value)
-
                  │
        ┌─────────┴──────────┐
        ▼                    ▼
-
   Behavioral Clustering   RFM Tiering
-  
        │                    │
        └─────────┬──────────┘
                  ▼
-  
   Segment Profiles + LTV Estimates
-  
                  │
                  ▼
-
 Growth Action Mapping per Segment
-
+```
 ---
 
 ## 🔢 Scoring System
