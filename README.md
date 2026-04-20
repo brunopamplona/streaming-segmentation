@@ -238,7 +238,7 @@ streaming-segmentation/
 │
 ├── data/
 │   ├── generate_streaming_data.py
-│   └── streaming_users.csv
+│   └── streaming_dataset_L30_L60_L90.xlsx
 │
 ├── notebooks/
 │   ├── 01_eda.ipynb
